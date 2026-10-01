@@ -36,7 +36,7 @@ export function hello(name: string): string {
 - Render fine
 
 1. Numbered lists too
-2. Same as you'd expect
+2. Second item
 
 | Column A | Column B |
 | -------- | -------- |
@@ -46,5 +46,5 @@ export function hello(name: string): string {
 
 ## See also
 
-- `CHEATSHEET.md` in this repository — full reference for every frontmatter
-  field, the Tool Store's fallback rules, and supported markdown features.
+- `CHEATSHEET.md` in this repository covers each frontmatter field, its
+  fallback, and the markdown features The Tool Store supports.
