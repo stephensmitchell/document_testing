@@ -1,12 +1,12 @@
 # Blog Post Frontmatter Cheatsheet
 
-A reference for everything The Tool Store recognizes at the top of a `.md`
-file. Drop a `TEMPLATE.md` next to this file for a copy-paste starting point.
+This reference lists the fields The Tool Store reads from the top of a `.md`
+file. For a copy-paste starting point, put a `TEMPLATE.md` next to this file.
 
-## How the frontmatter is parsed
+## Frontmatter parsing
 
-A post is just a markdown file. The optional **frontmatter block** at the very
-top is a YAML-ish header delimited by two `---` lines:
+A post is a markdown file with an optional **frontmatter block** at the top.
+The block is a YAML-ish header between two `---` lines:
 
 ```markdown
 ---
@@ -20,15 +20,16 @@ Markdown body starts here.
 
 Rules:
 
-- The opening `---` must be the **very first line** of the file. If it isn't,
-  the whole file is treated as the body and frontmatter defaults apply.
-- Closing `---` must appear on its own line.
-- Each field is `key: value` on one line. No nested objects.
-- Arrays use bracket form: `[item1, item2, item3]`. Quoted items are unquoted
-  during parsing.
-- `true` / `false` are interpreted as booleans.
-- Plain numeric values (e.g. `42`) become numbers.
-- Anything else becomes a string (with surrounding quotes stripped).
+- The opening `---` must sit on the **first line** of the file. Otherwise the
+  parser treats the whole file as body and applies the frontmatter defaults.
+- The closing `---` must sit on its own line.
+- Write each field as `key: value` on one line. The parser doesn't support
+  nested objects.
+- Arrays use bracket form: `[item1, item2, item3]`. The parser strips quotes
+  from quoted items.
+- `true` / `false` parse as booleans.
+- Plain numbers such as `42` parse as numbers.
+- Anything else parses as a string, with surrounding quotes stripped.
 
 ## Recognized fields
 
@@ -37,14 +38,14 @@ Rules:
 | `title` | string | no | First `# heading` in the body, or the filename slug |
 | `author` | string | no | The repo owner, gist owner, or "The Tool Store" |
 | `publishedAt` | ISO date / `YYYY-MM-DD` | no | The file's creation timestamp |
-| `date` | (alias for `publishedAt`) | no | — |
+| `date` | (alias for `publishedAt`) | no | Same as `publishedAt` |
 | `updatedAt` | ISO date | no | The file's modification timestamp |
 | `categories` | string array | no | `[]` |
-| `category` | (alias for `categories`) | no | — |
+| `category` | (alias for `categories`) | no | Same as `categories` |
 | `tags` | string array | no | `[]` |
 | `keywords` | string array | no | `[]` |
 | `excerpt` | string | no | First ~220 chars of the body, code blocks + links stripped |
-| `description` | (alias for `excerpt`) | no | — |
+| `description` | (alias for `excerpt`) | no | Same as `excerpt` |
 | `coverImage` | URL string | no | none |
 | `featured` | boolean | no | `false` |
 | `status` | `published` \| `draft` | no | `published` |
@@ -54,36 +55,36 @@ Rules:
 
 ### `title`
 
-Shown as the heading in the reader and on every card / list row.
+The reader uses the title as the post heading. Cards and list rows show it too.
 
 Fallback chain:
 1. Frontmatter `title`.
-2. The first `# heading` (or `##`, `###`, …) found in the body.
+2. The first `# heading` (or `##`, `###`, …) in the body.
 3. The filename without `.md` (e.g. `my-post.md` → `my-post`).
 
 ### `author`
 
-Shown next to the avatar in the reader and below the title in list/card views.
-The avatar itself defaults to the GitHub avatar of the repo / gist owner when
-available; you can override with `authorAvatar:` in frontmatter (URL).
+The reader shows the author next to the avatar. List and card views show it
+below the title. The avatar defaults to the GitHub avatar of the repo or gist
+owner. To override it, set `authorAvatar:` to an image URL in the frontmatter.
 
 ### `publishedAt` / `date`
 
-Used for the default sort (`Newest first`) and shown in the reader. Either
-field works. Accepts ISO 8601 (`2026-05-11T13:24:00Z`) or `YYYY-MM-DD`.
+The default sort (`Newest first`) uses this date, and the reader displays it.
+Both field names accept ISO 8601 (`2026-05-11T13:24:00Z`) or `YYYY-MM-DD`.
 
-If both `publishedAt` and `date` are set, `publishedAt` wins.
+If you set both, `publishedAt` wins.
 
 ### `updatedAt`
 
-Used by the `Recently updated` sort mode. Auto-set to the file's mtime if
-omitted.
+The `Recently updated` sort mode reads this field. If you omit it, The Tool
+Store uses the file's mtime.
 
 ### `categories`
 
-Each category is a **slug** (lowercase, hyphenated). The Tool Store
-auto-creates a `BlogCategory` for each unique slug referenced, with a
-title-cased display name. Admins can edit name, description, and color in
+Each category is a **slug** (lowercase, hyphenated). The Tool Store creates a
+`BlogCategory` for each unique slug it finds and gives it a title-cased display
+name. Admins can edit the name, description, and color in
 `CMS → Blog → Blog Categories`.
 
 ```yaml
@@ -92,68 +93,66 @@ categories: [news, getting-started, engineering]
 
 ### `tags`
 
-Free-form lowercase strings. Show up in the filter sidebar's Tags section
-with per-tag post counts. Anything goes — `tags: [release, beta, v0.1]`.
+Free-form lowercase strings. The filter sidebar's Tags section lists them with
+a post count for each. Any string works: `tags: [release, beta, v0.1]`.
 
 ### `keywords`
 
-Not displayed in the UI; only used by the sidebar's full-text Keyword search.
-Add terms you want a reader to find the post by even if those words aren't
-in the title or body.
+The UI doesn't display keywords. Only the sidebar's full-text Keyword search
+reads them. Add terms you want readers to find the post by when those words
+don't appear in the title or body.
 
 ### `excerpt` / `description`
 
-The one- or two-sentence summary shown in the post list (list and card
-views) and right under the title in the reader. If omitted, the system
-generates one from the body — but a hand-written excerpt is almost always
-better.
+A one- or two-sentence summary. The post list shows it in list and card views,
+and the reader shows it under the title. If you omit it, The Tool Store builds
+one from the first ~220 characters of the body. A hand-written excerpt reads
+better than that cut.
 
 ### `coverImage`
 
-Absolute URL to a hero image shown above the post in the reader and on
-medium / large cards in the list. Use a CDN-hosted image; local relative
-paths won't resolve when the post is loaded from a remote source.
+Absolute URL to a hero image. The reader shows it above the post, and medium
+and large cards in the list show it too. Use a CDN-hosted image: relative
+paths won't resolve when The Tool Store loads the post from a remote source.
 
 ### `featured`
 
-When `true`, the post:
+When `true`, the post gets a `Featured` badge in the list and appears in the
+`Featured only` filter. It still sorts by the active sort mode.
 
-- gets a `Featured` badge in the list,
-- shows up in the `Featured only` filter,
-- otherwise sorts normally.
-
-Use sparingly — featured loses meaning if every post is featured.
+Feature a handful of posts at most. If you feature them all, the badge tells
+readers nothing.
 
 ### `status`
 
 - `published` (default): visible to everyone.
-- `draft`: visible only to admins. Useful for staging a post in the repo
-  before it goes live.
+- `draft`: visible to admins only. Use it to stage a post in the repo before
+  it goes live.
 
 ### `readingTimeMinutes`
 
-Optional override. By default the Tool Store estimates from the rendered
-word count at ~220 words per minute. Set this if you want to force a
-specific number (e.g. for a tutorial that includes interactive steps).
+Optional override. By default The Tool Store estimates reading time from the
+rendered word count at ~220 words per minute. Set this to force a number, for
+example on a tutorial with interactive steps.
 
 ## Required body content
 
-There is **no** mandatory body field — an empty body works. Recommended
-minimum:
+The body has **no** required content, and an empty body works. For a useful
+post, include:
 
-1. Lead with a `# Heading` that matches `title` (or omit `title` from
-   frontmatter and let the heading drive the title).
-2. One paragraph hook.
-3. The actual content in `##` sections.
+1. A `# Heading` that matches `title`. You can also omit `title` from the
+   frontmatter and let the heading set it.
+2. A one-paragraph hook.
+3. The content, in `##` sections.
 
 ## Supported markdown features
 
-The Tool Store renders posts via the `marked` library with GitHub-flavored
+The Tool Store renders posts with the `marked` library, GitHub-flavored
 markdown enabled:
 
 - Headings `#` through `######`
 - **Bold**, *italic*, ***bold italic***, ~~strikethrough~~, `inline code`
-- [Links](https://example.com) — open in the user's default browser
+- [Links](https://example.com), which open in the user's default browser
 - Images via `![alt](url)`
 - Fenced code blocks with language hints (\`\`\`ts, \`\`\`python, etc.)
 - Bullet and numbered lists, including nested
@@ -162,42 +161,42 @@ markdown enabled:
 - Blockquotes
 - Horizontal rules (`---`)
 
-## How The Tool Store ingests this file
+## Ingesting from a GitHub repo
 
 1. The user adds this repo as a **Blog GitHub Repo Source** in
-   `CMS → Blog → Blog GitHub Repo Sources` (owner + repo). Public repos do
-   **not** require a token.
-2. On every Blog-tab visit the app calls
+   `CMS → Blog → Blog GitHub Repo Sources` (owner + repo). Public repos
+   **don't** need a token.
+2. On each Blog-tab visit, the app calls
    `GET https://api.github.com/repos/{owner}/{repo}/contents/{path}` once
-   to list every file.
-3. For each `.md` file, it fetches the raw body from
-   `raw.githubusercontent.com` (CDN, never rate-limited, no auth needed for
-   public repos).
-4. Frontmatter is parsed, body is kept as the post content, and the result
-   is written into the user's local CMS store under a stable ID
+   to list the repo's files.
+3. For each `.md` file, the app fetches the raw body from
+   `raw.githubusercontent.com`. That CDN has no rate limit and needs no auth
+   for public repos.
+4. The app parses the frontmatter, keeps the body as the post content, and
+   writes the result into the user's local CMS store under a stable ID
    (`gh-{owner}-{repo}-{path}`).
-5. The user's `enabled` flag is preserved across syncs — i.e. if they
-   disable a post once, it stays disabled even when the file refreshes.
+5. Syncs keep the user's `enabled` flag. If you disable a post once, it stays
+   disabled after the file refreshes.
 
-## How it works for a Gist
+## Ingesting from a Gist
 
-Identical, but the source URL is `gists/{gistId}`. Stable post IDs are
-`gist-{gistId}-{filename-slug}`. Auto-detected author is the gist owner
-from the API response.
+Gists work the same way, with `gists/{gistId}` as the source URL. Stable post
+IDs take the form `gist-{gistId}-{filename-slug}`, and the app takes the
+author from the gist owner in the API response.
 
 ## Common gotchas
 
-- **Indented `---`**: the opening / closing fence must start at column 0,
-  no leading spaces.
-- **Multi-line strings**: not supported. Keep each frontmatter value on a
-  single line. For long excerpts, write them as one long line.
+- **Indented `---`**: the opening and closing fences must start at column 0,
+  with no leading spaces.
+- **Multi-line strings**: not supported. Keep each frontmatter value on one
+  line, long excerpts included.
 - **Quoted keys**: not supported. Keys are plain identifiers.
-- **Empty arrays**: write `tags: []` — leaving the right side blank parses
-  as an empty string.
-- **Drafts on public sources**: `status: draft` files will still be fetched
-  from the public repo, but only admins of The Tool Store install will see
-  them in the Blog tab. The body is still readable by anyone with the repo
-  URL — *do not* put secrets in a draft post.
+- **Empty arrays**: write `tags: []`. A blank right side parses as an empty
+  string.
+- **Drafts on public sources**: The Tool Store still fetches `status: draft`
+  files from a public repo, and only admins of that install see them in the
+  Blog tab. Anyone with the repo URL can read the body, so *do not* put
+  secrets in a draft post.
 
 ## Minimum viable post
 
@@ -209,7 +208,7 @@ publishedAt: 2026-05-11
 
 # My First Post
 
-A one-paragraph body. That's the whole minimum.
+A one-paragraph body meets the minimum.
 ```
 
-Everything else falls back to a sensible default.
+Every other field falls back to the defaults in the Recognized fields table.
